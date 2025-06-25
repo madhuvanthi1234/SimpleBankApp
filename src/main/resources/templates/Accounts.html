@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Accounts</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h1>All Accounts</h1>
+    <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#addAccountModal">Add New Account</button>
+
+    <table class="table mt-3">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Holder Name</th>
+            <th>Balance</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="account : ${accountList}">
+            <td th:text="${account.id}"></td>
+            <td th:text="${account.holderName}"></td>
+            <td th:text="${account.balance}"></td>
+            <td>
+                <a th:href="@{/{id}/transactions(id=${account.id})}" class="btn btn-info">View Transactions</a>
+                <button class="btn btn-success" data-toggle="modal" data-target="#depositModal"
+                        th:data-id="${account.id}">Deposit</button>
+                <button class="btn btn-warning" data-toggle="modal" data-target="#withdrawModal"
+                        th:data-id="${account.id}">Withdraw</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Add Account Modal -->
+<div class="modal fade" id="addAccountModal" tabindex="-1" role="dialog" aria-labelledby="addAccountModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form action="/accounts/add" method="post">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addAccountModalLabel">Add Account</h5>
+                    <button class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="holderName">Holder Name</label>
+                        <input type="text" class="form-control" id="holderName" name="holderName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="initialBalance">Initial Balance</label>
+                        <input type="number" class="form-control" id="initialBalance" name="initialBalance" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Add Account</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Deposit Modal -->
+<div class="modal fade" id="depositModal" tabindex="-1" role="dialog" aria-labelledby="depositModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form id="depositForm" action="#" method="post">
+            <input type="hidden" id="depositAccountId" name="accountId">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="depositModalLabel">Deposit</h5>
+                    <button class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="depositAmount">Amount</label>
+                        <input type="number" class="form-control" id="depositAmount" name="amount" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Confirm Deposit</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Withdraw Modal -->
+<div class="modal fade" id="withdrawModal" tabindex="-1" role="dialog" aria-labelledby="withdrawModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form id="withdrawForm" action="#" method="post">
+            <input type="hidden" id="withdrawAccountId" name="accountId">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="withdrawModalLabel">Withdraw</h5>
+                    <button class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="withdrawAmount">Amount</label>
+                        <input type="number" class="form-control" id="withdrawAmount" name="amount" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Confirm Withdraw</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Dynamic form action and account ID handling
+    $('#depositModal, #withdrawModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var accountId = button.data('id');
+        var formAction = button.hasClass('btn-success')
+            ? '/' + accountId + '/deposit'
+            : '/' + accountId + '/withdraw';
+
+        $(this).find('input[name="accountId"]').val(accountId);
+        $(this).find('form').attr('action', formAction);
+    });
+</script>
+</body>
+</html>
